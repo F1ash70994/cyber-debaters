@@ -1,0 +1,47 @@
+{
+  "templates": {
+    "prompt_template": "你是{agent_name}。\n你的立场：{role}。\n\n{agent_prompt}\n\n{style_section}\n\n{mcps_section}\n\n{skills_section}\n\n{round_prompt}\n\n{answer_length_prompt}",
+    "round_prompt_template": "辩题：{topic}\n当前轮次：{current_round}/{total_rounds}。请关注当前轮次，循序渐进论证自己的观点。若当前是最后一轮，请对观点进行总结",
+    "answer_length_prompts": {
+      "concise": "回答长度要求：精简。\n请用 1-2 个短段落完成本轮发言，优先给出最关键的结论和 1-2 条核心理由。\n避免铺陈背景、重复辩题或展开过多例子；如需反驳对方，只抓住最重要的一点。",
+      "medium": "回答长度要求：适中。\n请用 2-4 个段落完成本轮发言，包含清晰立场、主要论据、必要例子，以及对已有观点的简要回应。\n表达要有结构，但不要写成过长论文；每个观点都应服务于当前轮次的推进。",
+      "detailed": "回答长度要求：详细。\n请充分展开本轮发言，建议包含：明确立场、分点论证、事实或例子支撑、对对方关键观点的回应、阶段性小结。\n允许使用 Markdown 标题、列表或表格组织内容，但仍需聚焦辩题，避免无关延伸。"
+    }
+  },
+  "models": [
+    {
+      "id": "mock-default",
+      "name": "Mock 本地演示",
+      "provider": "mock",
+      "model": "mock-pro",
+      "api_key": "",
+      "base_url": "",
+      "temperature": 0.7,
+      "max_tokens": 800
+    },
+    {
+      "id": "qwen-example",
+      "name": "Qwen 示例",
+      "provider": "qwen",
+      "model": "qwen-plus",
+      "api_key": "",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "temperature": 0.7,
+      "max_tokens": 2048
+    }
+  ],
+  "styles": [
+    {
+      "id": "style-vivid",
+      "name": "幽默风趣",
+      "prompt": "说话风格：幽默风趣，善于引用网络梗和真实事件论证自己的观点"
+    },
+    {
+      "id": "style-rational",
+      "name": "理性严谨",
+      "prompt": "说话风格：理性严谨。请使用清晰、克制、可验证的表达，优先定义概念、拆分前提、说明推理链条，避免情绪化措辞。"
+    }
+  ],
+  "skills": [],
+  "mcps": []
+}

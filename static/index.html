@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>赛博喷客</title>
+    <link rel="stylesheet" href="/styles.css?v=20260508-template-render" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <h1>赛博喷客</h1>
+            <p>当AI站上辩论台</p>
+          </div>
+          <div class="top-actions">
+            <label class="language-switch" aria-label="语言">
+              <span>语言</span>
+              <select id="languageSelect">
+                <option value="zh">中文</option>
+                <option value="en">English</option>
+              </select>
+            </label>
+            <nav class="page-tabs" aria-label="页面导航">
+              <button class="tab-button active" type="button" data-view="debateView">辩论</button>
+              <button class="tab-button" type="button" data-view="settingsView">设置</button>
+            </nav>
+            <div class="status-pill" id="statusPill">就绪</div>
+          </div>
+        </header>
+
+        <section class="view active" id="debateView">
+          <section class="layout">
+            <form class="config-panel" id="debateForm">
+              <div class="section-block">
+                <div class="section-heading">
+                  <h2>辩论设置</h2>
+                </div>
+                <label>
+                  辩题
+                  <textarea id="topic" rows="3" required>人工智能是否会显著提升人类社会的整体福祉？</textarea>
+                </label>
+                <div class="two-columns">
+                  <label>
+                    辩论轮数
+                    <input id="totalRounds" type="number" min="1" max="50" value="2" required />
+                  </label>
+                  <label>
+                    回答长度
+                    <select id="answerLength">
+                      <option value="concise">精简</option>
+                      <option value="medium" selected>适中</option>
+                      <option value="detailed">详细</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="two-columns">
+                  <label>
+                    Agent 数量
+                    <input id="agentCount" type="number" min="1" max="12" value="2" />
+                  </label>
+                  <div></div>
+                </div>
+              </div>
+
+              <div class="section-block">
+                <div class="section-heading">
+                  <h2>Agent 配置</h2>
+                  <button class="secondary-button" type="button" id="addAgentButton">添加 Agent</button>
+                </div>
+                <div class="inline-note" id="modelLibraryHint"></div>
+                <div class="agent-list" id="agentList"></div>
+              </div>
+            </form>
+
+            <section class="result-panel">
+              <div class="section-heading">
+                <h2>辩论过程</h2>
+                <div class="result-actions">
+                  <button class="primary-button" type="submit" form="debateForm" id="startButton">开始辩论</button>
+                  <button class="secondary-button" type="button" id="previewPromptButton">查看 Prompt 样例</button>
+                  <button class="danger-button" type="button" id="stopButton" disabled>停止</button>
+                  <button class="secondary-button" type="button" id="clearButton">清空</button>
+                </div>
+              </div>
+              <section class="prompt-preview" id="promptPreview" hidden>
+                <div class="section-heading">
+                  <h2>Prompt 样例</h2>
+                  <button class="secondary-button" type="button" id="hidePromptPreviewButton">收起</button>
+                </div>
+                <div class="prompt-preview-meta" id="promptPreviewMeta"></div>
+                <pre id="promptPreviewContent"></pre>
+              </section>
+              <div class="rounds" id="rounds">
+                <div class="empty-state">辩论开始后，发言会按轮次显示在这里。</div>
+              </div>
+            </section>
+          </section>
+          <button class="back-to-top-button" type="button" aria-label="回到顶部">↑</button>
+        </section>
+
+        <section class="view" id="settingsView">
+          <form class="settings-panel" id="settingsForm">
+            <aside class="settings-sidebar" id="settingsSidebar" aria-label="设置侧边栏">
+              <div class="sidebar-header">
+                <div>
+                  <h2>设置</h2>
+                  <p>配置会保存到本地 settings.json。</p>
+                </div>
+                <button class="icon-button" type="button" id="settingsSidebarToggleButton" aria-label="收缩设置侧边栏">‹</button>
+              </div>
+              <nav class="settings-sidebar-nav" aria-label="设置分类">
+                <a href="#settingsModelSection">
+                  <span class="nav-title">模型配置</span>
+                  <span class="nav-detail">Provider、模型、密钥与参数</span>
+                </a>
+                <a href="#settingsTemplateSection">
+                  <span class="nav-title">模板配置</span>
+                  <span class="nav-detail">提示词、轮数、回答长度、风格</span>
+                </a>
+                <a href="#settingsCapabilitySection">
+                  <span class="nav-title">能力配置</span>
+                  <span class="nav-detail">Skills 与 MCPs</span>
+                </a>
+              </nav>
+            </aside>
+
+            <div class="settings-content">
+              <div class="settings-content-header">
+                <button class="icon-button" type="button" id="settingsSidebarExpandButton" aria-label="展开设置侧边栏" hidden>›</button>
+                <span class="settings-message" id="settingsMessage"></span>
+                <div class="settings-header-actions">
+                  <span class="save-state saved" id="settingsSaveState">已保存</span>
+                  <button class="primary-button" type="submit" id="saveSettingsButton">保存设置</button>
+                </div>
+              </div>
+
+              <section class="config-panel settings-model-section" id="settingsModelSection">
+                <div class="section-block">
+                  <div class="section-heading">
+                    <h2>模型配置</h2>
+                    <button class="secondary-button" type="button" id="addModelButton">添加模型</button>
+                  </div>
+                  <div class="model-list" id="modelList"></div>
+                </div>
+              </section>
+
+              <section class="config-panel settings-template-section" id="settingsTemplateSection">
+                <div class="section-block">
+                  <div class="section-heading">
+                    <h2>模板配置</h2>
+                  </div>
+                  <div class="template-editor-grid">
+                    <label class="template-editor-pane">
+                      系统提示词编辑
+                      <textarea id="settingsPromptTemplate" rows="16" class="large-template"></textarea>
+                    </label>
+                    <section class="template-render-pane" aria-live="polite">
+                      <h3 id="settingsPromptRenderedTitle">完整提示词展示</h3>
+                      <pre id="settingsPromptRendered"></pre>
+                    </section>
+                  </div>
+                  <div class="placeholder-help">
+                    <h3>可用占位符</h3>
+                    <p id="promptPlaceholderHelp"></p>
+                  </div>
+                  <label>
+                    轮数信息 Prompt 模板
+                    <textarea id="settingsRoundPrompt" rows="5"></textarea>
+                  </label>
+                  <div class="template-group">
+                    <h3>回答长度 Prompt 模板</h3>
+                    <label>
+                      精简
+                      <textarea id="settingsLengthConcise" rows="4"></textarea>
+                    </label>
+                    <label>
+                      适中
+                      <textarea id="settingsLengthMedium" rows="4"></textarea>
+                    </label>
+                    <label>
+                      详细
+                      <textarea id="settingsLengthDetailed" rows="4"></textarea>
+                    </label>
+                  </div>
+                  <div class="section-heading">
+                    <h2>风格配置</h2>
+                    <button class="secondary-button" type="button" id="addStyleButton">添加风格</button>
+                  </div>
+                  <div class="style-list" id="styleList"></div>
+                </div>
+              </section>
+
+              <section class="config-panel settings-capability-section" id="settingsCapabilitySection">
+                <div class="section-block">
+                  <div class="section-heading">
+                    <h2>Skills 配置</h2>
+                    <button class="secondary-button" type="button" id="addSkillButton">导入 Skill</button>
+                  </div>
+                  <div class="skill-list" id="skillList"></div>
+                </div>
+                <div class="section-block">
+                  <div class="section-heading">
+                    <h2>MCPs 配置</h2>
+                    <button class="secondary-button" type="button" id="addMcpButton">导入 MCP</button>
+                  </div>
+                  <div class="mcp-list" id="mcpList"></div>
+                </div>
+              </section>
+            </div>
+          </form>
+          <button class="back-to-top-button" type="button" aria-label="回到顶部">↑</button>
+        </section>
+      </section>
+    </main>
+
+    <div class="modal-backdrop" id="unsavedSettingsDialog" hidden>
+      <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="unsavedSettingsTitle">
+        <h2 id="unsavedSettingsTitle">当前有未保存的设置，是否保存？</h2>
+        <p id="unsavedSettingsBody">离开设置页前，请选择如何处理当前修改。</p>
+        <div class="modal-actions">
+          <button class="primary-button" type="button" data-unsaved-action="save">确认保存</button>
+          <button class="secondary-button" type="button" data-unsaved-action="stash">暂存</button>
+          <button class="danger-button" type="button" data-unsaved-action="discard">放弃修改</button>
+          <button class="secondary-button" type="button" data-unsaved-action="cancel">取消</button>
+        </div>
+      </section>
+    </div>
+
+    <template id="agentTemplate">
+      <article class="agent-card">
+        <div class="agent-card-header">
+          <h3></h3>
+          <button class="icon-button remove-agent" type="button" aria-label="删除 Agent">×</button>
+        </div>
+        <div class="two-columns">
+          <label>
+            名称
+            <input data-field="name" required />
+          </label>
+          <label>
+            角色或立场
+            <input data-field="role" />
+          </label>
+        </div>
+        <label>
+          模型配置
+          <select data-field="model_config_id" required></select>
+        </label>
+        <label>
+          说话风格
+          <select data-field="style_id"></select>
+        </label>
+        <label>
+          Prompt
+          <textarea data-field="prompt" rows="3"></textarea>
+        </label>
+        <div class="two-columns">
+          <div class="field-label">
+            <span>MCPs</span>
+            <div class="multi-select" data-field="mcp_ids" data-placeholder="不使用 MCP" data-empty-label="设置页暂无 MCP"></div>
+          </div>
+          <div class="field-label">
+            <span>Skills</span>
+            <div class="multi-select" data-field="skill_ids" data-placeholder="不使用 Skill" data-empty-label="设置页暂无 Skill"></div>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <template id="modelTemplate">
+      <article class="model-card">
+        <div class="agent-card-header">
+          <h3></h3>
+          <button class="icon-button remove-model" type="button" aria-label="删除模型">×</button>
+        </div>
+        <div class="two-columns">
+          <label>
+            配置名称
+            <input data-field="name" required />
+          </label>
+          <label>
+            Provider
+            <select data-field="provider">
+              <option value="mock">Mock 本地演示</option>
+              <option value="openai">OpenAI</option>
+              <option value="anthropic">Anthropic</option>
+              <option value="openai_compatible">OpenAI Compatible</option>
+              <option value="deepseek">DeepSeek</option>
+              <option value="qwen">Qwen</option>
+              <option value="moonshot">Moonshot</option>
+              <option value="local">Local Compatible</option>
+            </select>
+          </label>
+        </div>
+        <div class="two-columns">
+          <label>
+            模型
+            <input data-field="model" required />
+          </label>
+          <label>
+            API Key
+            <input data-field="api_key" type="password" autocomplete="off" />
+          </label>
+        </div>
+        <label>
+          Base URL
+          <input data-field="base_url" placeholder="可选" />
+        </label>
+        <div class="two-columns">
+          <label>
+            Temperature
+            <input data-field="temperature" type="number" min="0" max="2" step="0.1" value="0.7" />
+          </label>
+          <label>
+            Max Tokens
+            <input data-field="max_tokens" type="number" min="1" max="8192" value="800" />
+          </label>
+        </div>
+      </article>
+    </template>
+
+    <template id="styleTemplate">
+      <article class="resource-card">
+        <div class="agent-card-header">
+          <h3></h3>
+          <button class="icon-button remove-style" type="button" aria-label="删除风格">×</button>
+        </div>
+        <label>
+          风格名称
+          <input data-field="name" required />
+        </label>
+        <label>
+          风格 Prompt
+          <textarea data-field="prompt" rows="4"></textarea>
+        </label>
+      </article>
+    </template>
+
+    <template id="skillTemplate">
+      <article class="resource-card">
+        <div class="agent-card-header">
+          <h3></h3>
+          <button class="icon-button remove-skill" type="button" aria-label="删除 Skill">×</button>
+        </div>
+        <label>
+          Skill 名称
+          <input data-field="name" required />
+        </label>
+        <label>
+          Skill Prompt
+          <textarea data-field="prompt" rows="4"></textarea>
+        </label>
+      </article>
+    </template>
+
+    <template id="mcpTemplate">
+      <article class="resource-card">
+        <div class="agent-card-header">
+          <h3></h3>
+          <button class="icon-button remove-mcp" type="button" aria-label="删除 MCP">×</button>
+        </div>
+        <label>
+          MCP 名称
+          <input data-field="name" required />
+        </label>
+        <label>
+          能力说明
+          <textarea data-field="description" rows="3"></textarea>
+        </label>
+        <label>
+          MCP 配置
+          <textarea data-field="config" rows="3" placeholder="可填写 URL、command 或 JSON 配置"></textarea>
+        </label>
+      </article>
+    </template>
+
+    <script src="/i18n.js?v=20260508-unsaved-dialog"></script>
+    <script src="/app.js?v=20260508-unsaved-dialog"></script>
+  </body>
+</html>
