@@ -6,6 +6,8 @@
 
 项目由 FastAPI 后端和原生 HTML/CSS/JavaScript 前端组成，不需要前端构建步骤。
 
+![赛博喷客中文界面](assets/case_zh.png)
+
 ## 功能概览
 
 - 多 Agent 辩论：配置辩题、轮数、回答长度和 1-12 个 Agent。

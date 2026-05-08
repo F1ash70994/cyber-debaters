@@ -6,6 +6,8 @@ Cyber Debaters is a locally run AI multi-agent debate platform. You can configur
 
 The project uses a FastAPI backend and a native HTML/CSS/JavaScript frontend. No frontend build step is required.
 
+![Cyber Debaters Chinese interface](assets/case_zh.png)
+
 ## Features
 
 - Multi-agent debates: configure the topic, number of rounds, answer length, and 1-12 agents.
